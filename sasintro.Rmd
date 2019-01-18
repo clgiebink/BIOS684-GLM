@@ -1,0 +1,83 @@
+---
+title: "Introduction to R"
+author: "Xiaoxiao Sun"
+date: "01/14/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup directory 
+
+
+```{r}
+#working directory #
+setwd("~/Desktop/SASUniversityEdition/myfolders/")
+```
+
+## Import data
+```{r}
+mydata = read.table("sasintro.txt")
+head(mydata)
+colnames(mydata) <- c("weight","bmi", "id","age","activity","education","smoking")
+head(mydata)
+```
+## Play with data
+```{r}
+
+#/*selecting a subset of rows*/
+#DATA mydata_smoking;
+#SET mydata;
+#IF smoking =1;
+#RUN;
+mydata_smoking <- mydata[mydata$smoking==1,]
+
+#/*deleting a column or multiple columns*/
+#DATA mydata_del;
+#SET mydata;
+#DROP weight education;
+#RUN;
+mydata_del <- mydata[,-c(1,6)]
+
+
+#/*CREATING A NEW VARIABLE*/
+#DATA mydata_add;
+#SET mydata;
+#weight_kg=weight*0.453;
+#IF age <=60 then agegroup=1;
+#ELSE IF age <=70 and age >60 THEN agegroup=2;
+#ELSE agegroup=3;
+#RUN; 
+
+weight_kg <- mydata$weight*0.453
+agegroup <- rep(3,length(mydata$age))
+agegroup[which(mydata$age <=70 & mydata$age >60)] <- 2
+agegroup[which(mydata$age <= 60)] <- 1
+
+#PROC MEANS DATA=mydata;
+#VAR weight;
+#RUN;
+
+summary(mydata$weight)
+
+#*PLOTS;
+#/*barcharts*/
+#PROC CHART DATA=mydata_add;
+#VBAR agegroup/DISCRETE;
+#RUN;
+counts <- table(agegroup)
+barplot(counts)
+
+#/*scatter plot*/
+#PROC PLOT DATA=mydata;
+#PLOT bmi*weight='*';
+#RUN;
+plot(bmi~weight,data=mydata)
+
+
+```
+
